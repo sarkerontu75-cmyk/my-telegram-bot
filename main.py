@@ -23,7 +23,7 @@ keep_alive()
 # --- বটের মূল কোড ---
 
 # আপনার তথ্য (এখানে ক্রেতার আইডি বসিয়ে দিলেই হবে)
-ADMIN_ID = 7291899180  
+ADMIN_ID =  7541488098
 BOT_TOKEN = "8612046126:AAE8MIpqGR-Ha4YH7PfiQVw_t33Fv3hLYQ4" 
 
 user_data_storage = {} 
