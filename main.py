@@ -4,7 +4,7 @@ from threading import Thread
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters, ContextTypes, CallbackQueryHandler
 
-# Flask সার্ভার সেটআপ (বটকে সজাগ রাখার জন্য)
+# Flask সার্ভার সেটআপ
 app = Flask('')
 
 @app.route('/')
@@ -22,8 +22,7 @@ keep_alive()
 
 # --- বটের মূল কোড ---
 
-# আপনার তথ্য (এখানে ক্রেতার আইডি বসিয়ে দিলেই হবে)
-ADMIN_ID =  7291899180
+ADMIN_ID = 7291899180  
 BOT_TOKEN = "8612046126:AAE8MIpqGR-Ha4YH7PfiQVw_t33Fv3hLYQ4" 
 
 user_data_storage = {} 
@@ -37,7 +36,6 @@ async def handle_document(update: Update, context: ContextTypes.DEFAULT_TYPE):
         user_id = update.effective_user.id
         user_data_storage[user_id] = {'file_id': file.file_id, 'file_name': file.file_name}
         
-        # পেমেন্ট মেথড বাটন (বাইনান্স যুক্ত করা হয়েছে)
         keyboard = [
             [InlineKeyboardButton("বিকাশ", callback_data='বিকাশ'),
              InlineKeyboardButton("নগদ", callback_data='নগদ')],
@@ -53,17 +51,15 @@ async def button_click(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await query.answer()
     user_id = query.from_user.id
 
-    # অ্যাডমিন যদি 'রিসিভ' বাটনে ক্লিক করে
     if query.data.startswith('received_'):
         target_user_id = query.data.split('_')[1]
         try:
             await context.bot.send_message(chat_id=target_user_id, text="✅ আপনার ফাইলটি অ্যাডমিন রিসিভ করেছে।")
             await query.edit_message_caption(caption=query.message.caption + "\n\n✅ Status: Received")
         except:
-            await query.edit_message_caption(caption=query.message.caption + "\n\n❌ ইউজারকে মেসেজ পাঠানো যায়নি।")
+            await query.edit_message_caption(caption=query.message.caption + "\n\n❌ ইউজারকে কনফার্মেশন পাঠানো যায়নি।")
         return
 
-    # ইউজার যদি পেমেন্ট মেথড সিলেক্ট করে
     if user_id in user_data_storage:
         user_data_storage[user_id]['method'] = query.data
         await query.edit_message_text(text=f"আপনার {query.data} নম্বর/আইডিটি দিন।")
@@ -74,10 +70,19 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
         data = user_data_storage[user_id]
         number = update.message.text
         
+        # ইউজারের ইউজারনেম বের করা
+        username = update.effective_user.username
+        mention = f"@{username}" if username else "ইউজারনেম নেই"
+
         await update.message.reply_text(f"আপনার {data['method']} তথ্য এবং ফাইল অ্যাডমিনের কাছে পাঠানো হয়েছে।")
 
-        # অ্যাডমিনের কাছে ফাইল পাঠানো (সাথে রিসিভ বাটন)
-        caption = f"🚀 নতুন ফাইল!\n👤 নাম: {update.effective_user.full_name}\n🆔 ইউজার আইডি: {user_id}\n💰 মাধ্যম: {data['method']}\n📱 নম্বর/আইডি: {number}"
+        # অ্যাডমিনের কাছে পাঠানো ক্যাপশনে ইউজারনেম যোগ করা হয়েছে
+        caption = (f"🚀 নতুন ফাইল!\n"
+                   f"👤 নাম: {update.effective_user.full_name}\n"
+                   f"🆔 ইউজারনেম: {mention}\n"
+                   f"🔢 আইডি: {user_id}\n"
+                   f"💰 মাধ্যম: {data['method']}\n"
+                   f"📱 নম্বর/আইডি: {number}")
         
         admin_keyboard = [[InlineKeyboardButton("✅ Receive", callback_data=f'received_{user_id}')]]
         admin_markup = InlineKeyboardMarkup(admin_keyboard)
