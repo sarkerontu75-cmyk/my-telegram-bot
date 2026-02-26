@@ -20,7 +20,7 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters, ContextTypes, CallbackQueryHandler
 
 # আপনার তথ্য
-ADMIN_ID = 7541488098  
+ADMIN_ID = 7291899180  
 BOT_TOKEN = "8612046126:AAE8MIpqGR-Ha4YH7PfiQVw_t33Fv3hLYQ4" 
 
 user_data_storage = {} 
